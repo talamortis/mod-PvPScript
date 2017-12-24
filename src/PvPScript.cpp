@@ -26,6 +26,9 @@ public:
     {
 
         std::string name = killer->GetOwner()->GetName();
+		
+		if (!sConfigMgr->GetBoolDefault("PvPChest", true))
+            return;
 
         //if killer has same IP as death player do not drop loot as its cheating!
         if (spawnchestIP)
