@@ -8,14 +8,12 @@
 #include "GossipDef.h"
 #include "Pet.h"
 
-uint32 entry;
 uint32 SUMMON_CHEST;
 uint32 KillAnnounce;
 bool spawnchestIP;
 uint32 chest_despawn;
 std::vector<uint32> MapstoIgnore = { 489, 592, 30, 566, 607, 628, 562, 618, 617, 559, 572 };
 std::vector<uint32> AreatoIgnore = { 1741/*Gurubashi*/, 2177 };
-
 
 class PvPScript : public PlayerScript
 {
@@ -24,30 +22,25 @@ public:
 
     void OnPlayerKilledByCreature(Creature* killer, Player* killed)
     {
+        if (!sConfigMgr->GetBoolDefault("PvPChest", true))
+            return;
 
         std::string name = killer->GetOwner()->GetName();
-		
-		if (!sConfigMgr->GetBoolDefault("PvPChest", true))
-            return;
 
         //if killer has same IP as death player do not drop loot as its cheating!
         if (spawnchestIP)
-        if (Pet* pet = killer->ToPet())
-            if (Player* owner = pet->GetOwner())
-                if (owner->GetSession()->GetRemoteAddress() == killed->GetSession()->GetRemoteAddress())
-                    return;
-
-        // Do this just incase
-        if (killer->IsPet())
-            killer->GetOwnerGUID();
+            if (Pet* pet = killer->ToPet())
+                if (Player* owner = pet->GetOwner())
+                    if (owner->GetSession()->GetRemoteAddress() == killed->GetSession()->GetRemoteAddress())
+                        return;
 
         // if player has Ress sickness do not spawn chest
         if (killed->HasAura(15007))
             return;
 
         //Gurubashi Arena
-        for (int i = 0; i < AreatoIgnore.size(); ++i)
-            if (killed->GetMapId() == 0 && killed->GetZoneId() == 33)
+        if (killed->GetMapId() == 0 && killed->GetZoneId() == 33)
+            for (int i = 0; i < AreatoIgnore.size(); ++i)
                 if (killed->GetAreaId() == AreatoIgnore[i])
                     return;
 
@@ -68,8 +61,6 @@ public:
             {
                 switch (KillAnnounce)
                 {
-                case 0: // Do nothing 
-                    break;
                 case 1: //Announce in chat handler
                     ChatHandler(killed->GetSession()).PSendSysMessage("You have been killed by player [%s] ", name.c_str());
                     break;
@@ -103,7 +94,7 @@ public:
             return;
 
         std::string name = killer->GetName();
-        
+
         //if killer has same IP as death player do not drop loot as its cheating!
         if (spawnchestIP)
             if (killer->GetSession()->GetRemoteAddress() == killed->GetSession()->GetRemoteAddress())
@@ -118,8 +109,8 @@ public:
             return;
 
         //Gurubashi Arena
-        for (int i = 0; i < AreatoIgnore.size(); ++i)
-            if (killed->GetMapId() == 0 && killed->GetZoneId() == 33)
+        if (killed->GetMapId() == 0 && killed->GetZoneId() == 33)
+            for (int i = 0; i < AreatoIgnore.size(); ++i)
                 if (killed->GetAreaId() == AreatoIgnore[i])
                     return;
 
@@ -138,8 +129,6 @@ public:
             {
                 switch (KillAnnounce)
                 {
-                case 0: // Do nothing 
-                    break;
                 case 1: //Announce in chat handler
                     ChatHandler(killed->GetSession()).PSendSysMessage("You have been killed by player [%s] ", name.c_str());
                     break;
