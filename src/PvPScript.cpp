@@ -1,4 +1,4 @@
-#include "Configuration/Config.h"
+﻿#include "Configuration/Config.h"
 #include "Player.h"
 #include "Creature.h"
 #include "AccountMgr.h"
@@ -12,7 +12,6 @@ uint32 SUMMON_CHEST;
 uint32 KillAnnounce;
 bool spawnchestIP;
 uint32 chest_despawn;
-std::vector<uint32> MapstoIgnore = { 489, 592, 30, 566, 607, 628, 562, 618, 617, 559, 572 };
 std::vector<uint32> AreatoIgnore = { 1741/*Gurubashi*/, 2177 };
 
 class PvPScript : public PlayerScript
@@ -31,8 +30,14 @@ public:
         if (spawnchestIP)
             if (Pet* pet = killer->ToPet())
                 if (Player* owner = pet->GetOwner())
+                {
                     if (owner->GetSession()->GetRemoteAddress() == killed->GetSession()->GetRemoteAddress())
                         return;
+
+                    // Dont drop loot if killed is not worth honor for owner
+                    if (!owner->isHonorOrXPTarget(killed))
+                        return;
+                }
 
         // if player has Ress sickness do not spawn chest
         if (killed->HasAura(15007))
@@ -46,9 +51,8 @@ public:
 
 
         // Dont drop chess if player is in battleground
-        for (int i = 0; i < MapstoIgnore.size(); ++i)
-            if (killed->GetMapId() == MapstoIgnore[i])
-                return;
+        if (killed->GetMap()->IsBattlegroundOrArena())
+            return;
 
         //Dont Drop chest if player is no worth XP
         if (!killed->isHonorOrXPTarget(killer->GetOwner()))
@@ -119,9 +123,8 @@ public:
             return;
 
         // Dont drop chess if player is in battleground
-        for (int i = 0; i < MapstoIgnore.size(); ++i)
-            if (killed->GetMapId() == MapstoIgnore[i])
-                return;
+        if (killed->GetMap()->IsBattlegroundOrArena())
+            return;
 
         if (!killed->IsAlive())
         {
@@ -165,11 +168,14 @@ public:
     void OnBeforeConfigLoad(bool reload) override
     {
         if (!reload) {
-            std::string cfg_file = "PvPScript.conf";
+            std::string conf_path = _CONF_DIR;
+            std::string cfg_file = conf_path + "/PvPScript.conf";
+
+#ifdef WIN32
+            cfg_file = "PvPScript.conf";
+#endif
             std::string cfg_def_file = cfg_file + ".dist";
-
             sConfigMgr->LoadMore(cfg_def_file.c_str());
-
             sConfigMgr->LoadMore(cfg_file.c_str());
 
             SUMMON_CHEST = sConfigMgr->GetIntDefault("ChestID", 179697);
