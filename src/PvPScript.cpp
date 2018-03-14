@@ -24,6 +24,10 @@ public:
         if (!sConfigMgr->GetBoolDefault("PvPChest", true))
             return;
 
+        if (!killer->IsPet())
+        return;
+
+
         std::string name = killer->GetOwner()->GetName();
 
         //if killer has same IP as death player do not drop loot as its cheating!
@@ -78,7 +82,7 @@ public:
                 }
 
                 killer->AddGameObject(go);
-                go->SetOwnerGUID(NULL); //This is so killed players can also loot the chest
+                go->SetOwnerGUID(0); //This is so killed players can also loot the chest
 
                 for (int i = EQUIPMENT_SLOT_START; i < EQUIPMENT_SLOT_END; ++i)
                     if (Item* pItem = killed->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
@@ -145,7 +149,7 @@ public:
                 }
 
                 killer->AddGameObject(go);
-                go->SetOwnerGUID(NULL); //This is so killed players can also loot the chest
+                go->SetOwnerGUID(0); //This is so killed players can also loot the chest
 
                 for (int i = EQUIPMENT_SLOT_START; i < EQUIPMENT_SLOT_END; ++i)
                     if (Item* pItem = killed->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
