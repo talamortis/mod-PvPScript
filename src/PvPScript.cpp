@@ -1,4 +1,4 @@
-﻿#include "Configuration/Config.h"
+#include "Configuration/Config.h"
 #include "Player.h"
 #include "Creature.h"
 #include "AccountMgr.h"
@@ -7,6 +7,7 @@
 #include "Define.h"
 #include "GossipDef.h"
 #include "Pet.h"
+#include "Item.h"
 
 uint32 SUMMON_CHEST;
 uint32 KillAnnounce;
@@ -88,7 +89,7 @@ public:
                     if (Item* pItem = killed->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
                     {
                         uint8 slot = pItem->GetSlot();
-                        LootStoreItem storeItem = LootStoreItem(pItem->GetEntry(), 100, LOOT_MODE_DEFAULT, 0, 1, 1);
+                        LootStoreItem storeItem = LootStoreItem(pItem->GetEntry(), 0, 100, 0, LOOT_MODE_DEFAULT, 0, 1, 1);
                         go->loot.AddItem(storeItem);
                         killed->DestroyItem(INVENTORY_SLOT_BAG_0, slot, true);
                     }
@@ -155,7 +156,7 @@ public:
                     if (Item* pItem = killed->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
                     {
                         uint8 slot = pItem->GetSlot();
-                        LootStoreItem storeItem = LootStoreItem(pItem->GetEntry(), 100, LOOT_MODE_DEFAULT, 0, 1, 1);
+                        LootStoreItem storeItem = LootStoreItem(pItem->GetEntry(), 0, 100, 0, LOOT_MODE_DEFAULT, 0, 1, 1);
                         go->loot.AddItem(storeItem);
                         killed->DestroyItem(INVENTORY_SLOT_BAG_0, slot, true);
                     }
