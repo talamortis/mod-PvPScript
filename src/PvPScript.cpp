@@ -7,6 +7,7 @@
 #include "GossipDef.h"
 #include "Pet.h"
 #include "LootMgr.h"
+#include "Chat.h"
 
 uint32 SUMMON_CHEST;
 uint32 KillAnnounce;
