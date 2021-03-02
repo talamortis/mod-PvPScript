@@ -173,16 +173,6 @@ public:
     void OnBeforeConfigLoad(bool reload) override
     {
         if (!reload) {
-            std::string conf_path = _CONF_DIR;
-            std::string cfg_file = conf_path + "/PvPScript.conf";
-
-#ifdef WIN32
-            cfg_file = "PvPScript.conf";
-#endif
-            std::string cfg_def_file = cfg_file + ".dist";
-            sConfigMgr->LoadMore(cfg_def_file.c_str());
-            sConfigMgr->LoadMore(cfg_file.c_str());
-
             SUMMON_CHEST = sConfigMgr->GetIntDefault("ChestID", 179697);
             KillAnnounce = sConfigMgr->GetIntDefault("KillAnnounce", 1);
             chest_despawn = sConfigMgr->GetIntDefault("ChestTimer", 120);
