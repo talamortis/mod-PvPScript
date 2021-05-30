@@ -83,7 +83,7 @@ public:
                 }
 
                 killer->AddGameObject(go);
-                go->SetOwnerGUID(0); //This is so killed players can also loot the chest
+                go->SetOwnerGUID(ObjectGuid::Empty); //This is so killed players can also loot the chest
 
                 for (int i = EQUIPMENT_SLOT_START; i < EQUIPMENT_SLOT_END; ++i)
                     if (Item* pItem = killed->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
@@ -150,7 +150,7 @@ public:
                 }
 
                 killer->AddGameObject(go);
-                go->SetOwnerGUID(0); //This is so killed players can also loot the chest
+                go->SetOwnerGUID(ObjectGuid::Empty); //This is so killed players can also loot the chest
 
                 for (int i = EQUIPMENT_SLOT_START; i < EQUIPMENT_SLOT_END; ++i)
                     if (Item* pItem = killed->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
