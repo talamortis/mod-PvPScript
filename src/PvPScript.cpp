@@ -1,13 +1,14 @@
-#include "Configuration/Config.h"
-#include "Player.h"
-#include "Creature.h"
 #include "AccountMgr.h"
-#include "ScriptedAI/ScriptedCreature.h"
-#include "ScriptMgr.h"
+#include "Chat.h"
+#include "Configuration/Config.h"
+#include "Creature.h"
 #include "Define.h"
 #include "GossipDef.h"
-#include "Pet.h"
 #include "Item.h"
+#include "Pet.h"
+#include "Player.h"
+#include "ScriptedAI/ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 uint32 SUMMON_CHEST;
 uint32 KillAnnounce;
@@ -83,7 +84,7 @@ public:
                 }
 
                 killer->AddGameObject(go);
-                go->SetOwnerGUID(0); //This is so killed players can also loot the chest
+                go->SetOwnerGUID(ObjectGuid::Empty); //This is so killed players can also loot the chest
 
                 for (int i = EQUIPMENT_SLOT_START; i < EQUIPMENT_SLOT_END; ++i)
                     if (Item* pItem = killed->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
@@ -150,7 +151,7 @@ public:
                 }
 
                 killer->AddGameObject(go);
-                go->SetOwnerGUID(0); //This is so killed players can also loot the chest
+                go->SetOwnerGUID(ObjectGuid::Empty); //This is so killed players can also loot the chest
 
                 for (int i = EQUIPMENT_SLOT_START; i < EQUIPMENT_SLOT_END; ++i)
                     if (Item* pItem = killed->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
@@ -179,9 +180,6 @@ public:
 #ifdef WIN32
             cfg_file = "PvPScript.conf";
 #endif
-            std::string cfg_def_file = cfg_file + ".dist";
-            sConfigMgr->LoadMore(cfg_def_file.c_str());
-            sConfigMgr->LoadMore(cfg_file.c_str());
 
             SUMMON_CHEST = sConfigMgr->GetIntDefault("ChestID", 179697);
             KillAnnounce = sConfigMgr->GetIntDefault("KillAnnounce", 1);
