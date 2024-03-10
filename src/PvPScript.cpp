@@ -1,4 +1,4 @@
-﻿#include "Configuration/Config.h"
+#include "Configuration/Config.h"
 #include "Player.h"
 #include "Creature.h"
 #include "AccountMgr.h"
@@ -9,20 +9,19 @@
 #include "LootMgr.h"
 #include "Chat.h"
 
-uint32 SUMMON_CHEST;
-uint32 KillAnnounce;
+uint32 SummonChest, KillAnnounce;
 bool spawnchestIP;
-uint32 chest_despawn;
-std::vector<uint32> AreatoIgnore = { 1741/*Gurubashi*/, 2177 };
+uint32 chestDespawn;
+std::vector<uint32> AreatoIgnore = { 1741 /*Gurubashi*/, 2177 };
 
 class PvPScript : public PlayerScript
 {
 public:
-    PvPScript() :   PlayerScript("PvPScript") {}
+    PvPScript() : PlayerScript("PvPScript") {}
 
     void OnPlayerKilledByCreature(Creature* killer, Player* killed)
     {
-        if (!sConfigMgr->GetBoolDefault("PvPChest", true))
+        if (!sConfigMgr->GetOption<bool>("PvPChest", true))
             return;
 
         if (!killer->IsPet())
@@ -66,7 +65,7 @@ public:
         // if target is killed and killer is pet
         if (!killed->IsAlive() && killer->IsPet())
         {
-            if (GameObject* go = killer->SummonGameObject(SUMMON_CHEST, killed->GetPositionX(), killed->GetPositionY(), killed->GetPositionZ(), killed->GetOrientation(), 0.0f, 0.0f, 0.0f, 0.0f, chest_despawn, false))
+            if (GameObject* go = killer->SummonGameObject(SummonChest, killed->GetPositionX(), killed->GetPositionY(), killed->GetPositionZ(), killed->GetOrientation(), 0.0f, 0.0f, 0.0f, 0.0f, chestDespawn, false))
             {
                 switch (KillAnnounce)
                 {
@@ -99,7 +98,7 @@ public:
 
     void OnPVPKill(Player* killer, Player* killed)
     {
-        if (!sConfigMgr->GetBoolDefault("PvPChest", true))
+        if (!sConfigMgr->GetOption<bool>("PvPChest", true))
             return;
 
         std::string name = killer->GetName();
@@ -133,7 +132,7 @@ public:
 
         if (!killed->IsAlive())
         {
-            if (GameObject* go = killer->SummonGameObject(SUMMON_CHEST, killed->GetPositionX(), killed->GetPositionY(), killed->GetPositionZ(), killed->GetOrientation(), 0.0f, 0.0f, 0.0f, 0.0f, chest_despawn, false))
+            if (GameObject* go = killer->SummonGameObject(SummonChest, killed->GetPositionX(), killed->GetPositionY(), killed->GetPositionZ(), killed->GetOrientation(), 0.0f, 0.0f, 0.0f, 0.0f, chestDespawn, false))
             {
                 switch (KillAnnounce)
                 {
@@ -152,7 +151,7 @@ public:
                 killer->AddGameObject(go);
                 go->SetOwnerGUID(ObjectGuid::Empty); //This is so killed players can also loot the chest
 
-                for (int i = EQUIPMENT_SLOT_START; i < EQUIPMENT_SLOT_END; ++i)
+                for (uint8 i = EQUIPMENT_SLOT_START; i < EQUIPMENT_SLOT_END; ++i)
                     if (Item* pItem = killed->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
                     {
                         uint8 slot = pItem->GetSlot();
@@ -172,11 +171,12 @@ public:
 
     void OnBeforeConfigLoad(bool reload) override
     {
-        if (!reload) {
-            SUMMON_CHEST = sConfigMgr->GetIntDefault("ChestID", 179697);
-            KillAnnounce = sConfigMgr->GetIntDefault("KillAnnounce", 1);
-            chest_despawn = sConfigMgr->GetIntDefault("ChestTimer", 120);
-            spawnchestIP = sConfigMgr->GetBoolDefault("spawnchestIP", true);
+        if (!reload)
+        {
+            SummonChest = sConfigMgr->GetOption<uint32>("ChestID", 179697);
+            KillAnnounce = sConfigMgr->GetOption<uint8>("KillAnnounce", 1);
+            chestDespawn = sConfigMgr->GetOption<uint8>("ChestTimer", 120);
+            spawnchestIP = sConfigMgr->GetOption<bool>("spawnchestIP", true);
         }
     }
 };
