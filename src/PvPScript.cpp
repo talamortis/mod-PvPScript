@@ -19,7 +19,7 @@ class PvPScript : public PlayerScript
 public:
     PvPScript() : PlayerScript("PvPScript") {}
 
-    void OnPlayerKilledByCreature(Creature* killer, Player* killed, bool& durabilityLoss)
+    void OnPlayerKilledByCreature(Creature* killer, Player* killed/*, bool& durabilityLoss*/ )
     {
         if (!sConfigMgr->GetOption<bool>("PvPChest", true))
             return;
