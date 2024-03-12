@@ -19,14 +19,13 @@ class PvPScript : public PlayerScript
 public:
     PvPScript() : PlayerScript("PvPScript") {}
 
-    void OnPlayerKilledByCreature(Creature* killer, Player* killed/*, bool& durabilityLoss*/ )
+    void OnPlayerKilledByCreature(Creature* killer, Player* killed/*, bool& durabilityLoss*/)
     {
         if (!sConfigMgr->GetOption<bool>("PvPChest", true))
             return;
 
         if (!killer->IsPet())
-        return;
-
+            return;
 
         std::string name = killer->GetOwner()->GetName();
 
@@ -45,13 +44,8 @@ public:
         // if target is killed and killer is pet
         if (!killed->IsAlive() && killer->IsPet())
         {
-            if (GameObject* go = killer->SummonGameObject(SummonChest, killed->GetPositionX(), killed->GetPositionY(), killed->GetPositionZ(), killed->GetOrientation(), 0.0f, 0.0f, 0.0f, 0.0f, chestDespawn, false))
-            {
-                AnnounceKill(KillAnnounce, killed, name.c_str());
-                killer->AddGameObject(go);
-                go->SetOwnerGUID(ObjectGuid::Empty); //This is so killed players can also loot the chest
-                SpawnChest(killed, go);
-            }
+            AnnounceKill(KillAnnounce, killed, name.c_str());
+            SpawnChest(killer, killed);
         }
     }
 
@@ -67,13 +61,18 @@ public:
 
         if (!killed->IsAlive())
         {
-            if (GameObject* go = killer->SummonGameObject(SummonChest, killed->GetPositionX(), killed->GetPositionY(), killed->GetPositionZ(), killed->GetOrientation(), 0.0f, 0.0f, 0.0f, 0.0f, chestDespawn, false))
-            {
-                AnnounceKill(KillAnnounce, killed, name.c_str());
-                killer->AddGameObject(go);
-                go->SetOwnerGUID(ObjectGuid::Empty); //This is so killed players can also loot the chest
-                SpawnChest(killed, go);
-            }
+            SpawnChest(killer, killed);
+            AnnounceKill(KillAnnounce, killed, name.c_str());
+        }
+    }
+
+    void SpawnChest(Unit* killer, Player* killed)
+    {
+        if (GameObject* go = killer->SummonGameObject(SummonChest, killed->GetPositionX(), killed->GetPositionY(), killed->GetPositionZ(), killed->GetOrientation(), 0.0f, 0.0f, 0.0f, 0.0f, chestDespawn, false))
+        {
+            killer->AddGameObject(go);
+            go->SetOwnerGUID(ObjectGuid::Empty); //This is so killed players can also loot the chest
+            AddChestItems(killed, go);
         }
     }
 
@@ -126,7 +125,7 @@ public:
         }
     }
 
-    void SpawnChest(Player* killed, GameObject* go)
+    void AddChestItems(Player* killed, GameObject* go)
     {
         for (uint8 i = EQUIPMENT_SLOT_START; i < EQUIPMENT_SLOT_END; ++i)
             if (Item* pItem = killed->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
